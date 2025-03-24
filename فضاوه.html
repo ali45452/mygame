@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تجريبي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+  <style>
+body {
+  overflow: hidden;
+  margin: 0;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  background: linear-gradient(-45deg, #2c2c2c, #004ea7, #ac0031, #333);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+
+  color: white;
+  text-align: center;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+    .hex-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    @keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modern-title {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 40px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  animation: fadeSlide 1s ease forwards;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+.row {
+  display: flex;
+}
+
+.row:not(:first-child) {
+  margin-top: -19px; /* تجعل الخلايا تدخل في بعضها */
+}
+
+.offset {
+  margin-right: 686px; /* تزح الصف */
+}
+.odd-offset {
+  margin-right: 727px;
+}
+.hex-wrapper {
+  width: 540px; /* أو حسب حجم شبكتك */
+  height: 450px; /* نفس العرض لتكوين مربع */
+  overflow: hidden;
+  border: 5px solid #000; /* لإظهار إطار حول المربع */
+  margin: 0 auto; /* لتوسيطه إن أردت */
+  position: relative;
+}
+#button-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.hex-grid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-25%, -50%);
+}
+    .hex {
+      width: 90px;
+      height: 90px;
+      background: white;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: -2px;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 24px;
+      letter-spacing: 1px;
+      user-select: none;
+      color: #000; /* لون أسود واضح */
+      transition: background-color 0.3s;
+    }
+
+    .red {
+      background-color: #ac0031 !important;
+      color: white;
+    }
+
+    .green {
+      background-color: #004ea7 !important;
+    }
+    .gold {
+      background-color: gold;
+    }
+    .controls {
+      margin-top: 30px;
+    }
+    .circle-button {
+      background-color: #007bff;
+      border: none;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #questionText {
+  color: #222; /* أسود رمادي أنيق */
+}
+    .circle-button:hover {
+      background-color: #0056b3;
+    }
+    .background-letters span {
+  position: absolute;
+  font-family: 'Cairo', sans-serif;
+  font-size: 60px;
+  color: rgba(255, 255, 255, 0.025);
+  user-select: none;
+  white-space: nowrap;
+  direction: rtl;
+}
+#answerText {
+  color: #000000; /* أزرق واضح وجميل */
+  font-weight: bold;
+  display: none;
+  margin-top: 15px;
+}
+.background-letters span {
+  position: absolute;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 60px;
+  color: rgba(255, 255, 255, 0.03);
+  user-select: none;
+  white-space: nowrap;
+}
+
+  </style>
+</head>
+<body>
+  <div class="background-letters" id="letterBackground"></div>
+  <div id="questionOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); z-index:9998;"></div>
+
+  <div id="questionBox" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:30px; border-radius:16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index:9999; width: 400px; max-width: 90%;">
+    <div id="timerBox" style="font-size: 18px; margin-bottom: 15px; color: #007bff; font-weight: bold;">
+      الوقت المتبقي: <span id="timerCount">10</span> ثانية
+    </div>
+    <h2 id="questionText" style="margin-bottom:20px; font-size:22px;">سؤال:</h2>
+  
+    <button onclick="showAnswer()" style="background:#007bff; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:16px;">اظهار الإجابة</button>
+  
+    <p id="answerText" style="display:none; margin-top:15px; font-weight:bold; font-size:18px;"></p>
+  
+    <div style="margin-top:20px; display:flex; justify-content:space-between;">
+      <button onclick="closeQuestionBox()" style="background:#dc3545; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">إغلاق</button>
+      <button onclick="showAnotherQuestion()" style="background:#28a745; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">سؤال آخر</button>
+    </div>
+  </div>
+  <h1 class="modern-title">فضاوه</h1>
+  <div class="hex-wrapper">
+    <div class="hex-grid">
+  <div class="hex-grid" id="board"></div>
+</div>
+<div id="winBanner" style="
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+  color: white;
+  font-size: 24px;
+  padding: 15px 30px;
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  z-index: 9999;
+  animation: fadeInDrop 1s ease forwards;
+">
+  🎉 مبروك! فزت! 🎉
+</div>
+</div>
+<div class="controls">
+  <div id="button-container">
+    <!-- زر تغيير الحروف -->
+    <button class="circle-button" onclick="shuffleLetters()" title="تغيير الحروف">
+      <i class="fas fa-random"></i>
+    </button>
+
+    <!-- زر إعادة اللعبة -->
+    <button class="circle-button" onclick="resetGame()" title="إعادة اللعبة">
+      <i class="fas fa-retweet"></i>
+    </button>
+  </div>
+
+  <script>
+    const layout = [
+      ['green','red', 'red', 'red', 'red', 'red', 'green'],
+      ['green', 'ص', 'ظ', 'ط', 'ض', 'ك', 'green'],
+      ['green', 'خ', 'ع', 'ج', 'ن', 'ح', 'green'],
+      ['green', 'ض', 'ش', 'ف', 'ط', 'أ', 'green'],
+      ['green', 'س', 'د', 'ي', 'غ', 'غ', 'green'],
+      ['green', 'ز', 'ث', 'و', 'ب', 'ت', 'green'],
+      ['green','red', 'red', 'red', 'red', 'red', 'green']
+    ];
+    const qaData = {
+  'ص': [
+    { question: "ما اسم فاكهة تبدأ بحرف ص؟", answer: "صبار" },
+    { question: "ما اسم حيوان يبدأ بحرف ص؟", answer: "صقر" }
+  ],
+  'ظ': [
+    { question: "ما اسم شيء موجود في السماء يبدأ بحرف ظ؟", answer: "ظلال" },
+    { question: "ما اسم شيء يُستخدم للكتابة ويبدأ بحرف ظ؟", answer: "ظرف" }
+  ],
+  'ط': [
+    { question: "ما اسم حيوان يبدأ بحرف ط؟", answer: "طاووس" },
+    { question: "ما اسم مهنة تبدأ بحرف ط؟", answer: "طبيب" }
+  ],
+  // وهكذا لبقية الحروف...
+};
+
+    const board = document.getElementById("board");
+    let originalLetters = [];
+
+    function createBoard() {
+      board.innerHTML = '';
+      originalLetters = [];
+      layout.forEach((row, rowIndex) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "row";
+        if (rowIndex % 2 !== 0) rowDiv.classList.add("offset");
+        if (rowIndex % 2 === 0) {
+  rowDiv.classList.add("odd-offset"); // الصفوف 0، 2، 4، 6
+}
+
+        row.forEach(cell => {
+          const div = document.createElement("div");
+          div.className = "hex";
+
+          if (cell === 'red') {
+  div.classList.add('red');
+} else if (cell === 'green') {
+  div.classList.add('green');
+} else if (cell === 'gold') {
+  div.classList.add('gold');
+} else {
+  div.textContent = cell;
+  originalLetters.push(cell);
+
+  // 🟡🔴🟢 التفاعل لتغيير اللون: ذهبي → أحمر → أخضر → لا شيء
+  div.addEventListener("click", () => {
+  // تحقق إذا تم عرض السؤال سابقاً لهذا الحرف
+  if (!div.dataset.shown) {
+    showQuestion(div.textContent);         // عرض السؤال مرة واحدة
+    div.dataset.shown = "true";            // تعليم بأنه تم عرض السؤال
+    return;                                // نوقف هنا، ما نغير اللون في أول ضغطة
+  }
+
+  if (div.classList.contains("gold")) {
+    div.classList.remove("gold");
+    div.classList.add("red");
+  } else if (div.classList.contains("red")) {
+    div.classList.remove("red");
+    div.classList.add("green");
+  } else if (div.classList.contains("green")) {
+    div.classList.remove("green");
+  } else {
+    div.classList.add("gold");
+  }
+  });
+}
+function showQuestion(letter) {
+  const entries = qaData[letter];
+  if (entries && entries.length > 0) {
+    const randomIndex = Math.floor(Math.random() * entries.length);
+    const selectedQA = entries[randomIndex];
+
+    document.getElementById('questionText').textContent = selectedQA.question;
+    document.getElementById('answerText').textContent = selectedQA.answer;
+    document.getElementById('answerText').style.display = 'none';
+    document.getElementById('questionBox').style.display = 'block';
+
+    startTimer(10); // <-- لازم تكون هنا
+  }
+}
+
+
+          rowDiv.appendChild(div);
+        });
+
+        board.appendChild(rowDiv);
+      });
+    }
+
+    function shuffleLetters() {
+      const letters = [...originalLetters];
+      letters.sort(() => Math.random() - 0.5);
+      let index = 0;
+
+      const allHexes = document.querySelectorAll(".hex");
+      allHexes.forEach(div => {
+        if (!div.classList.contains("red") && !div.classList.contains("green")) {
+          div.textContent = letters[index++];
+        }
+      });
+    }
+
+    function resetGame() {
+      createBoard();
+    }
+// إظهار السؤال عند الضغط على الحرف
+function showQuestion(letter) {
+  if (qaData[letter]) {
+    document.getElementById('questionText').textContent = qaData[letter].question;
+    document.getElementById('answerText').textContent = qaData[letter].answer;
+    document.getElementById('answerText').style.display = 'none';
+    document.getElementById('questionBox').style.display = 'block';
+  }
+}
+let timerInterval;
+
+function startTimer(duration = 10) {
+  let timeLeft = duration;
+  const timerCount = document.getElementById('timerCount');
+  timerCount.textContent = timeLeft;
+
+  clearInterval(timerInterval); // تأكد من مسح أي مؤقت سابق
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerCount.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerCount.textContent = "انتهى الوقت!";
+      timerCount.style.color = "#dc3545"; // أحمر عند الانتهاء
+    }
+  }, 1000);
+}
+// زر إظهار الإجابة
+function showAnswer() {
+  document.getElementById('answerText').style.display = 'block';
+}
+
+// زر إغلاق
+function closeQuestionBox() {
+  document.getElementById('questionBox').style.display = 'none';
+  clearInterval(timerInterval);
+document.getElementById('timerCount').style.color = '#007bff'; // رجّع اللون الأزرق
+}
+    createBoard();
+    const letters = "أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي".split(" ");
+  const container = document.getElementById('letterBackground');
+
+  for (let i = 0; i < 40; i++) {
+    const span = document.createElement("span");
+    span.textContent = letters[Math.floor(Math.random() * letters.length)];
+    span.style.top = `${Math.random() * 100}%`;
+    span.style.left = `${Math.random() * 100}%`;
+    span.style.transform = `rotate(${Math.random() * 360}deg)`;
+    span.style.fontSize = `${40 + Math.random() * 60}px`;
+    container.appendChild(span);
+  }
+  </script>
+</body>
+</html>
